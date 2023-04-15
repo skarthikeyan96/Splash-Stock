@@ -1,9 +1,10 @@
-import type { NextPage } from 'next'
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import type { GetServerSidePropsContext, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 
-const Home: NextPage = () => {
+const Home: NextPage = (props: any) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -12,11 +13,37 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+      
+
+      {
+        JSON.stringify(props.user)
+      }
+    
     </div>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const supabase = createServerSupabaseClient(ctx);
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  };
+};
 
 export default Home
