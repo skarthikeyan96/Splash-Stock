@@ -1,7 +1,9 @@
 import { LockClosedIcon } from "@heroicons/react/20/solid";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useUser } from "@supabase/auth-helpers-react";
-import Link from "next/link";
+import { GetServerSidePropsContext } from "next";
 import React from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { supabase } from "../helper/supabaseClient";
 
 const Login = () => {
@@ -10,14 +12,19 @@ const Login = () => {
   console.log(user);
 
   const [email, setEmail] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  
   const handleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      setLoading(true)
+      const { error } = await supabase.auth.signInWithOtp({ email,options: {
+        emailRedirectTo: '/',
+      } });
       if (error) throw error;
-      alert("Check your email for the login link!");
+      toast.success("Check your email for the login link!");
+      setLoading(false)
     } catch (error: any) {
-      console.log(error)
-      // alert(error.error_description || error.message);
+       console.log(error)
     } finally {
     }
   };
@@ -53,19 +60,32 @@ const Login = () => {
             </div>
 
             <div className="space-y-6">
+      
+              
               <button
                 onClick={handleLogin}
                 className="group relative flex w-full justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
               >
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                {
+                  loading ?  <svg className="w-5 h-5 mr-3 -ml-1 text-white-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path className="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                  </path>
+              </svg> :  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <LockClosedIcon className="h-5 w-5 " aria-hidden="true" />
                 </span>
-                Sign in
+                }
+               
+                { loading ? `Processing ... ` : `Sign in` }
               </button>
              
             </div>
         </div>
       </div>
+      <Toaster />
+
     </>
   );
 };
