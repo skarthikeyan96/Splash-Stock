@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import Navbar from '../components/navbar';
+import { AnimatePresence } from 'framer-motion';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -15,7 +16,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       initialSession={pageProps.initialSession}
     >
       <Navbar/>
+      <AnimatePresence 
+          initial={false}
+          mode="wait"
+          onExitComplete={() => window.scrollTo(0, 0)}
+      >
       <Component {...pageProps} />
+      </AnimatePresence>
     </SessionContextProvider>
  )
   
