@@ -4,7 +4,6 @@ import React from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Layout from "../components/layout";
 import LoadingComponent from "../components/loading";
-import { v4 as uuidv4 } from 'uuid';
 
 const UploadImage = () => {
   const [uploading, setUploading] = React.useState(false);
@@ -30,16 +29,7 @@ const UploadImage = () => {
         .from("images")
         .upload(filePath, file, { upsert: true });
 
-    //   const { data, error } = await supabase
-    //     .storage
-    //     .from('avatars')
-    //     .upload(user?.id + "/" + uuidv4(), file)
-
-    //   const { data, error } = await supabase.storage
-    //     .from("avatars")
-    //     .upload("public/" + file?.name, file as File);
-
-      if (error) {
+         if (error) {
         toast("upload failed");
       }
 
@@ -49,7 +39,6 @@ const UploadImage = () => {
         router.push("/")
       }
 
-      // console.log(data)
     } catch (error: any) {
       toast(error);
     } finally {

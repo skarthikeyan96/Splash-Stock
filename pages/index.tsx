@@ -1,15 +1,9 @@
-import {
-  createServerSupabaseClient,
-  SupabaseClient,
-} from "@supabase/auth-helpers-nextjs";
-import type { GetServerSidePropsContext, NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { toast, Toaster } from "react-hot-toast";
-import Layout from "../components/layout";
 
 // for concatentating the classes
 function concat(...classes: string[]) {
@@ -51,21 +45,7 @@ const Home: NextPage = (props: any) => {
       limit: 99999
     });
 
-    // console.log(res)
-    // const { data, error } = await supabase
-    //   .storage
-    //   .from('images')
-    //   .list(user?.id + "/", {
-    //     limit: 100,
-    //     offset: 0,
-    //     sortBy: { column: "name", order: "asc"}
-    //   });   // Cooper/
-    //   // data: [ image1, image2, image3 ]
-    //   // image1: { name: "subscribeToCooperCodes.png" }
-
-    //   // to load image1: CDNURL.com/subscribeToCooperCodes.png -> hosted image
-
-    if (data !== null) {
+      if (data !== null) {
       setImages(data);
     } else {
       console.log(error);
@@ -93,13 +73,11 @@ const Home: NextPage = (props: any) => {
 
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {/* Images will go here */}
           {loadImages ? <p> Loading ... </p> : images.map((image: any) => {
               return <div key={image.name}> <ImageComponent url={CDN + image.name} /> </div>;
           })}
         </div>
       </div>
-      <Toaster />
     </div>
   );
 };
