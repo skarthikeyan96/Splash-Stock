@@ -1,6 +1,6 @@
 ## Splash Stock 
 
-image management application using Next.js and Supabase.
+Image management application using Next.js and Supabase.
 
 
 ## Features 
