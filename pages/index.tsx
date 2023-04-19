@@ -95,10 +95,7 @@ const Home: NextPage = (props: any) => {
         <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           {/* Images will go here */}
           {loadImages ? <p> Loading ... </p> : images.map((image: any) => {
-            if(image.name !== ".emptyFolderPlaceholder"){ // temp hack
-              return <ImageComponent url={CDN + image.name} />;
-
-            }
+              return <div key={image.name}> <ImageComponent url={CDN + image.name} /> </div>;
           })}
         </div>
       </div>
