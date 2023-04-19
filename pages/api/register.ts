@@ -12,7 +12,6 @@ export default async function handler(
         {email, password}
     )
 
-    console.log(data)
 
   res.status(200).json({ name: 'John Doe' })
 }

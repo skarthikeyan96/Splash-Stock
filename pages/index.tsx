@@ -1,9 +1,9 @@
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import {  useState } from "react";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
 // for concatentating the classes
 function concat(...classes: string[]) {
@@ -33,35 +33,8 @@ const ImageComponent = (props: any) => {
 };
 
 const Home: NextPage = (props: any) => {
-  const CDN = `https://drtpnmlhaicavlzmjgcb.supabase.co/storage/v1/object/public/images/`;
-  const user = useUser();
-  const [images, setImages] = useState<any>([]);
-  const [loadImages, setLoadImages] = useState(false);
 
-  const supabase = useSupabaseClient();
-  async function getImages() {
-    setLoadImages(true)
-    const { data, error } = await supabase.storage.from("images").list("",{
-      limit: 99999
-    });
-
-      if (data !== null) {
-      setImages(data);
-    } else {
-      console.log(error);
-    }
-
-    setLoadImages(false)
-
-  }
-
-  useEffect(() => {
-    // if (user) {
-      getImages();
-    // }
-  }, []);
-
-  console.log(images);
+  const {data: photos} = props.photos
 
   return (
     <div className={styles.container}>
@@ -73,8 +46,8 @@ const Home: NextPage = (props: any) => {
 
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {loadImages ? <p> Loading ... </p> : images.map((image: any) => {
-              return <div key={image.name}> <ImageComponent url={CDN + image.name} /> </div>;
+          {photos.map((photo: any) => {
+              return <div key={photo.id}> <ImageComponent url={photo.path} /> </div>;
           })}
         </div>
       </div>
@@ -83,3 +56,19 @@ const Home: NextPage = (props: any) => {
 };
 
 export default Home;
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx);
+  // Check if we have a session
+
+  // disabled the RLS for products table
+  const photos = await supabase.from("photoLibrary").select("*");
+
+  return {
+    props: {
+      photos,
+    },
+  };
+};
+

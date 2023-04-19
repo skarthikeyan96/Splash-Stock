@@ -5,8 +5,8 @@ Image management application using Next.js and Supabase.
 
 ## Features 
 
-1. Magic Link Login with Email and Logout functionality.
-2. Ability to upload the image by the user.
+1. Magic Link Login with Email and Logout functionality. ✅
+2. Ability to upload the image by the user. ✅
 3. Ability to delete the image.
 4. Ability to update the image.
 

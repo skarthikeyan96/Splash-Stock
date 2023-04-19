@@ -22,7 +22,6 @@ const Login = () => {
       toast.success("Check your email for the login link!");
       setLoading(false);
     } catch (error: any) {
-      console.log(error);
     } finally {
     }
   };

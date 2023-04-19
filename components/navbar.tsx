@@ -18,7 +18,6 @@ const Navbar = () => {
 
   const supabase = useSupabaseClient();
 
-  console.log(user);
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
 

@@ -1,30 +1,33 @@
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { createServerSupabaseClient, Session, User } from "@supabase/auth-helpers-nextjs";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Layout from "../components/layout";
 import LoadingComponent from "../components/loading";
 
-const UploadImage = () => {
+type UploadProps = {
+  initialSession: Session,
+  user: User
+}
+const UploadImage = (props: UploadProps) => {
   const [uploading, setUploading] = React.useState(false);
 
   const supabase = useSupabaseClient();
-  const user = useUser();
 
   const router = useRouter();
   
   const uploadImage = async (e: any) => {
     try {
       setUploading(true);
-      console.log(e.target.files[0]);
-
+      
       const file = e.target.files[0];
-      const fileExtension = file.name.split(".").pop();
+      
       const fileName = `${file?.name}`;
       const filePath = `${fileName}`;
 
-      console.log(filePath)
-      console.log(user?.id)
+  
       const { data, error } = await supabase.storage
         .from("images")
         .upload(filePath, file, { upsert: true });
@@ -35,8 +38,18 @@ const UploadImage = () => {
 
       if(data){
         toast("upload complete, redirecting...");
+        var nameMatch = props.user.email?.match(/^([^@]*)@/);
+        var name = nameMatch ? nameMatch[1] : null;
+        const url = `https://drtpnmlhaicavlzmjgcb.supabase.co/storage/v1/object/public/images/${data.path}`
+        // add a row to the table with image url and the respective user
+        const { error } = await supabase.from('photoLibrary').insert({ userid: props.user.id, email: props.user.email, username: name, path: url })
 
-        router.push("/")
+
+        if(!error){
+          router.push("/")
+        }
+
+        return toast(' something went worng.')
       }
 
     } catch (error: any) {
@@ -69,6 +82,30 @@ const UploadImage = () => {
       <Toaster />
     </Layout>
   );
+};
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx);
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+
+  return {
+    props: {
+      initialSession: session,
+      user: session.user,
+    },
+  };
 };
 
 export default UploadImage;
